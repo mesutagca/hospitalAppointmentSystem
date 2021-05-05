@@ -4,19 +4,28 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Recipe extends Model
 {
     use HasFactory;
 
-    public function treatment()
+    /**
+     * All of the relationships to be touched.
+     *
+     * @var array
+     */
+    protected $touches = ['treatment'];
+
+    public function treatment(): BelongsTo
     {
         return $this->belongsTo(Treatment::class);
     }
 
-    public function medicine()
+    public function medicines(): BelongsToMany
     {
-        return $this->belongsTo(Medicine::class);
+        return $this->belongsToMany(Medicine::class);
     }
 
 }

@@ -14,6 +14,7 @@ use App\Models\MedicineCompany;
 use App\Models\Patient;
 use App\Models\PatientDocument;
 use App\Models\Recipe;
+use App\Models\RecipeMedicine;
 use App\Models\Treatment;
 use App\Models\User;
 use Illuminate\Database\Seeder;
@@ -52,9 +53,9 @@ class UserSeeder extends Seeder
             'birthday' => '1900-01-01 21.00.45',
             'gender' => 'male',
             'email_verified_at' => '2021-04-29 21:00:45',
-            'email' => 'pation@gmail.com',
+            'email' => 'patient@gmail.com',
             'password' => Hash::make('12345678'),
-            'type' => 'pation',
+            'type' => 'patient',
         ])->create();
 
         $patient1 = Patient::factory()->count(1)
@@ -75,18 +76,20 @@ class UserSeeder extends Seeder
             'type' => 'doctor',
         ])->create();
 
-        $doctor1 = Doctor::factory()->count(1)
+        Branch::factory()->create();
+
+        $doctor1 = Doctor::factory(
+            [
+                'branch_id'=>1,
+            ]
+        )->count(1)
             ->for($user3)
-            ->has(
-                Branch::factory()
-                    ->count(1)
-            )
             ->has(
                 DoctorDocument::factory()
                     ->count(1)
             )
             ->create();
-        //iki tane for yaparken collection oluyor
+
 
         $appointment1 = Appointment::factory([
             'doctor_id' => 1,
@@ -105,16 +108,24 @@ class UserSeeder extends Seeder
             ->has(PatientDocument::factory())
             ->count(1)->create();
 
-        $medicine1 = MedicineCompany::factory()
-            ->has(Medicine::factory())
+        $medicineCompany= MedicineCompany::factory()->create();
+
+
+
+         $medicine1=Medicine::factory()
+             ->for($medicineCompany)
+            ->has(Recipe::factory(
+                [
+                    'treatment_id'=>1,
+                ]
+            ))
             ->create();
 
-        Recipe::factory(
-            [
-                'medicine_id'=>1,
-                'treatment_id'=>1,
-            ]
-        );
+
+
+
+
+
     }
 
 }

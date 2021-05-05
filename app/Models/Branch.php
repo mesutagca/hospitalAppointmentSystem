@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 
 class Branch extends Model
@@ -14,8 +14,8 @@ class Branch extends Model
     /**
      * Get the doctor associated with the Branch.
      */
-    public function doctor(): BelongsTo
+    public function doctor(): HasMany
     {
-        return $this->belongsTo(Doctor::class);
+        return $this->hasMany(Doctor::class);
     }
 }

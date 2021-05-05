@@ -21,7 +21,7 @@ class Patient extends Model
     }
 
     /**
-     * Get the appointment associated with the pation.
+     * Get the appointment associated with the patient.
      */
     public function patient(): HasMany
     {

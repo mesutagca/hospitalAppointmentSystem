@@ -23,9 +23,9 @@ class Doctor extends Model
     /**
      * Get the branch associated with the doctor.
      */
-    public function branch(): HasOne
+    public function branch(): BelongsTo
     {
-        return $this->hasOne(Branch::class);
+        return $this->belongsTo(Branch::class);
     }
 
     /**

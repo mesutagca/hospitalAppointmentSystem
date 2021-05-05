@@ -21,7 +21,7 @@ class Appointment extends Model
     }
 
     /**
-     * Get the pation associated with the appointment.
+     * Get the patient associated with the appointment.
      *
      * @return BelongsTo
      */

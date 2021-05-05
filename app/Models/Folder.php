@@ -10,6 +10,13 @@ class Folder extends Model
 {
     use HasFactory;
 
+    /**
+     * All of the relationships to be touched.
+     *
+     * @var array
+     */
+    protected $touches = ['appointment'];
+
     public function appointment()
     {
        return $this->belongsTo(Appointment::class);
