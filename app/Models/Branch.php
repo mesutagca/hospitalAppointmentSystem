@@ -11,6 +11,8 @@ class Branch extends Model
 {
     use HasFactory;
 
+    protected $fillable=['name'];
+
     /**
      * Get the doctor associated with the Branch.
      */

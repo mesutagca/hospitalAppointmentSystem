@@ -2,7 +2,13 @@
 
 namespace App\Providers;
 
+use App\Auth\Guards\CustomGuard;
+use App\Models\Branch;
+use App\Policies\BranchPolicy;
+use App\Services\AuthenticationService;
+use App\Services\Contracts\AuthenticationServiceContract;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 
 class AuthServiceProvider extends ServiceProvider
@@ -13,7 +19,7 @@ class AuthServiceProvider extends ServiceProvider
      * @var array
      */
     protected $policies = [
-        // 'App\Models\Model' => 'App\Policies\ModelPolicy',
+      Branch::class => BranchPolicy::class,
     ];
 
     /**
@@ -23,8 +29,10 @@ class AuthServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        $this->registerPolicies();
+        Auth::extend('custom', function () {
+            return new CustomGuard();
+        });
 
-        //
+        $this->registerPolicies();
     }
 }

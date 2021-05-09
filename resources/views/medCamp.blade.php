@@ -24,6 +24,8 @@
                             <div class="form-group">
                                 <label for="companyName">companyName</label>
                                 <input type="text" name="name" class="form-control" id="companyName" >
+                                <label for="companyAddress">companyAddress</label>
+                                <input type="text" name="address" class="form-control" id="companyAddress" >
                             </div>
                         </div>
                         <div class="modal-footer">

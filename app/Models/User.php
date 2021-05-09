@@ -79,9 +79,9 @@ class User extends Authenticatable
     /**
      * @return bool
      */
-    public static function isAdmin(): bool
+    public function isAdmin(): bool
     {
-       return auth()->user()->type=='admin';
+       return $this->type=='admin';
     }
 
     /**
@@ -89,7 +89,7 @@ class User extends Authenticatable
      */
     public static function isDoctor(): bool
     {
-        return auth()->user()->type=='doctor';
+        return auth()->user()->type =='doctor';
     }
 
     /**
@@ -97,8 +97,11 @@ class User extends Authenticatable
      */
     public static function isPatient(): bool
     {
-        return auth()->user()->type=='isPatient';
+        return auth()->user()->type =='isPatient';
     }
+
+
+
 
 
 

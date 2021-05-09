@@ -22,7 +22,7 @@ class BranchFactory extends Factory
     public function definition()
     {
         return [
-            'branch' => 'psychiatry',
+            'name' => 'psychiatry',
         ];
     }
 }

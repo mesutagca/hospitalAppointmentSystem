@@ -11,6 +11,8 @@ class Medicine extends Model
 {
     use HasFactory;
 
+    protected $fillable=['name','medicine_company_id','active_ingredient','barcode'];
+
     public function recipes(): BelongsToMany
     {
         return $this->belongsToMany(Recipe::class);

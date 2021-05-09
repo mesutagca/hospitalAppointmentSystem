@@ -9,6 +9,8 @@ class Diagnose extends Model
 {
     use HasFactory;
 
+    protected $fillable=['name'];
+
     public function folder()
     {
        return $this->belongsTo(Folder::class);

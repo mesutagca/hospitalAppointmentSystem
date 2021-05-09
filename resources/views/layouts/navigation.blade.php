@@ -18,6 +18,15 @@
                     <x-nav-link :href="route('medicineCompany.index')" :active="request()->routeIs('medicineCompany.index')">
                         MedicineCompany
                     </x-nav-link>
+                    <x-nav-link :href="route('medicine.index')" :active="request()->routeIs('medicine.index')">
+                        Medicine
+                    </x-nav-link>
+                    <x-nav-link :href="route('branch.index')" :active="request()->routeIs('branch.index')">
+                        Branch
+                    </x-nav-link>
+                    <x-nav-link :href="route('diagnose.index')" :active="request()->routeIs('diagnose.index')">
+                        Diagnose
+                    </x-nav-link>
                 </div>
             </div>
 
