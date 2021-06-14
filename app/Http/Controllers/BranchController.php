@@ -2,69 +2,70 @@
 
 namespace App\Http\Controllers;
 
-
 use App\Http\Requests\Branch\BranchListRequest;
 use App\Http\Requests\Branch\BranchStoreRequest;
-use App\Models\User;
-use App\Repositories\Contracts\BranchRepositoryContract;
+use App\Http\Resources\Branch\BranchResource;
+use App\Models\Branch;
 use App\Services\Contracts\BranchServiceContract;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Redirect;
 
 class BranchController extends Controller
 {
-    private BranchRepositoryContract $branchRepository;
+    private BranchServiceContract $branchService;
 
-    public function __construct(BranchRepositoryContract $branchRepository)
+    public function __construct(BranchServiceContract $branchService)
     {
-        $this->branchRepository=$branchRepository;
+        $this->branchService=$branchService;
     }
+
 
     public function index(BranchListRequest $request)
-    { //dd(Auth::user());
-        return view('branch',['branches'=>$this->branchRepository->getAll($request)]);
-    }
-
-    public function list()
     {
-        return $this->branchService->getAll();
+       $this->authorize('index', Branch::class);
+       return view('branch');
     }
 
-    public function show($branch_id)
-    {//toArray()
-        return view('branch',['branches'=>$this->branchService->show($branch_id)]);
+    public function list(BranchListRequest $request)
+    {
+        $this->authorize('list', Branch::class);
+        return BranchResource::collection( $this->branchService->list($request))
+            ->response()
+            ->setStatusCode(200);
+    }
+
+    public function show(BranchListRequest $request, $branch_id):JsonResponse
+    {
+        $this->authorize('show', Branch::class);
+        $branch=$this->branchService->show($request,$branch_id);
+        return BranchResource::make($branch)
+            ->response()
+            ->setStatusCode(200);
     }
 
     public function store(BranchStoreRequest $request)
     {
-
+       $this->authorize('store', Branch::class);
+        //Gate::authorize('create', Branch::class);
             $this->branchService->store($request);
             return Redirect::back();
     }
 
-    public function update($branch_id,Request $request)
+    public function update(BranchStoreRequest $request,  $branch_id)
     {
-
-        if (User::isAdmin()) {
-            $data=['name'=>$request->name];
-            $this->branchService->update($branch_id,$data);
-            return view('branch',['branches'=>$this->branchService->getAll()]);
-        }
-        return view('branch', [
-            'ERROR'=>'yetkiniz yok  Bunu blade te göstereedim ',
-            'branches'=>$this->branchService->getAll()
-        ]);
+        /** @var Branch $branch */
+        $branch=$this->branchService->show($request, $branch_id);
+        $this->authorize('update', $branch );
+        return $this->branchService->update($request, $branch);
     }
 
-    public function delete($branch_id)
+    public function delete(Request $request, $branch_id)
     {
-        if (User::isAdmin()) {
-            $this->branchService->delete($branch_id);
-            return view('branch',['branches'=>$this->branchService->getAll()]);
-        }
-        return view('branch', [
-            'ERROR'=>'yetkiniz yok  Bunu blade te göstereedim ',
-            'branches'=>$this->branchService->getAll()
-        ]);
+        /** @var Branch $branch */
+        $branch = $this->branchService->show($request, $branch_id);
+        $this->authorize('delete', Branch::class);
+        return $this->branchService->delete($branch);
     }
 }

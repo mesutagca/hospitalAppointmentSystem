@@ -26,19 +26,15 @@ class BranchService implements BranchServiceContract
     }
 
     public function list(BranchListRequest $request)
-    {
-        /** @var BranchListFilters $branchFilter */
+    {    /** @var BranchListFilters $branchFilter */
         $branchFilter = app(BranchListFilters::class);
         $branchFilter->setFilters($request->all());
 
-        //checks if with_trashed or sorting or some other params
         $this->branchRepository->parseRequest($request->all());
-
         $this->branchRepository
             ->with([
-                //
-            ])   ;
-          //sıkıntılı  ->withFilters($branchFilter);
+            //'relations',
+        ])->withFilters($branchFilter);
 
         return $this->branchRepository->getAll(['*']);
     }
@@ -46,10 +42,9 @@ class BranchService implements BranchServiceContract
     public function show(Request $request, int $branchId): ?Model
     {
         $this->branchRepository->parseRequest($request->all());
-        $this->branchRepository
-            ->with(['features']);
+        $this->branchRepository->with(['doctors','doctors.user']);
 
-        return json_encode($this->branchRepository->getById($branchId));
+        return $this->branchRepository->getById($branchId);
     }
 
     /**
@@ -59,7 +54,6 @@ class BranchService implements BranchServiceContract
      */
     public function store(BranchStoreRequest $request): ?Model
     {
-
         //check if already exists
         /** @var BranchListFilters $branchFilter */
         $branchFilter = app(BranchListFilters::class);
@@ -67,34 +61,25 @@ class BranchService implements BranchServiceContract
 
         /** @var ?Branch $branch */
         $branch = $this->branchRepository
-           // ->withFilters($branchFilter)
-          // ->withTrashed()
+            ->withFilters($branchFilter)
+            ->withTrashed()
             ->getAll(['*'])->first();
 
-        if (!$branch) {
-            $this->branchRepository->transaction(function () use ($request, &$branch) {
-                /** @var ?Branch $branch */
-                $branch =  $this->branchRepository->create($request->validated());
+        if ($branch) {
 
-                if ($branch->name != $request->input('name')) {
-                    abort(
-                        prepareCustomResponse(
-                            ExceptionMessages::BRANCH_ALREADY_EXISTS,
-                            409,
-                            ResponseCodes::BRANCH_ALREADY_EXISTS
-                        )
-                    );
-                }
-
-                if ($branch->trashed()) {
-                    $branch->restore();
-                }
-
-                return $this->branchRepository->update($branch, ['re-active' => true]);
-            });
+            if ($branch->trashed()) {
+                 $branch->restore();
+                 return $branch;
+            }
+            abort(
+                prepareCustomResponse(
+                    ExceptionMessages::BRANCH_ALREADY_EXISTS,
+                    409,
+                    ResponseCodes::BRANCH_ALREADY_EXISTS
+                )
+            );
         }
-        return $branch;
-
+        return $this->branchRepository->create($request->validated());
     }
 
     /**
@@ -105,12 +90,7 @@ class BranchService implements BranchServiceContract
      */
     public function update(BranchStoreRequest $request, Branch $branch): ?Model
     {
-        $this->branchRepository->transaction(function () use ($request, &$branch) {
-            /** @var  Branch $branch*/
-            $branch = $this->branchRepository->update($branch, $request->validated());
-        });
-
-        return $branch;
+       return $this->branchRepository->update($branch, $request->validated());
     }
 
     public function delete(?Model $branch): ?bool

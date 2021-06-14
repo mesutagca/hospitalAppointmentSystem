@@ -6,6 +6,7 @@ use App\Models\Admin;
 use App\Models\User;
 use Database\Factories\AdminFactory;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
 
 class AdminSeeder extends Seeder
 {
@@ -16,6 +17,13 @@ class AdminSeeder extends Seeder
      */
     public function run()
     {
+        Admin::factory([
+            'user_id'=>1
+        ])->create();
 
+
+        Admin::factory([
+            'user_id'=>2
+        ])->create();
     }
 }

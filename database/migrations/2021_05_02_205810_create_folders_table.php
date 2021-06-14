@@ -16,7 +16,8 @@ class CreateFoldersTable extends Migration
         Schema::create('folders', function (Blueprint $table) {
             $table->id();
             $table->foreignId('appointment_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('diagnose_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('diagnose_id')->nullable()->constrained()->cascadeOnDelete();
+            $table->string('disease_detail')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

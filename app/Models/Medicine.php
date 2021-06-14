@@ -2,14 +2,19 @@
 
 namespace App\Models;
 
+use App\Filters\Traits\Filterable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
+
 
 class Medicine extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
+    use Filterable;
 
     protected $fillable=['name','medicine_company_id','active_ingredient','barcode'];
 
@@ -18,7 +23,7 @@ class Medicine extends Model
         return $this->belongsToMany(Recipe::class);
     }
 
-    public function medicineCompany()
+    public function medicineCompany(): BelongsTo
     {
         return $this->belongsTo(MedicineCompany::class);
     }

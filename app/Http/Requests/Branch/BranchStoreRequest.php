@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests\Branch;
 
+
 use Illuminate\Foundation\Http\FormRequest;
+
 
 class BranchStoreRequest extends FormRequest
 {
@@ -13,7 +15,8 @@ class BranchStoreRequest extends FormRequest
      */
     public function authorize()
     {
-       return auth()->user()->isAdmin();
+      // return Gate::allows('create', Branch::class);//bool döner
+        return true;
     }
 
     /**
@@ -24,7 +27,7 @@ class BranchStoreRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => 'required|string|max:5',
+            'name' => 'required|string|max:15',
         ];
     }
 }

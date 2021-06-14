@@ -21,6 +21,7 @@ class CreateDoctorsTable extends Migration
                 ->cascadeOnDelete();
             $table->string('status');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

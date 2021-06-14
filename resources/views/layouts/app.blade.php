@@ -16,11 +16,91 @@
         <!-- Scripts -->
         <script src="{{ asset('js/app.js') }}" defer></script>
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
         <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
 
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+        <script>
+            $.ajaxSetup({
+                headers:{
+                    'X-CSRF-TOKEN':$('meta[name="csrf-token"]').attr('content')
+                }
+            });
+        </script>
+
+        <script>
+
+            var withTrashed = false;
+            var orderBy = 'id';
+            var orderType = 'desc';
+            var searchKey = '';
+
+            function adjustWithTrash() {
+                withTrashed = true;
+
+                if (!$("#withTrash").prop('checked')) {
+                    withTrashed = false;
+                }
+
+                fetchData();
+            }
+
+            function adjustOrder(selectObject) {
+                var value = $(selectObject).val();
+                orderBy = 'id';
+                orderType = 'desc';
+                if (value === 'newest') {
+                    orderBy = 'created_at';
+                    orderType = 'desc';
+                }
+                if (value === 'oldest') {
+                    orderBy = 'created_at';
+                    orderType = 'asc';
+                }
+                if (value === 'name') {
+                    orderBy = 'name';
+                    orderType = 'asc';
+                }
+                if (value === 'active_ingredient') {
+                    orderBy = 'active_ingredient';
+                    orderType = 'asc';
+                }
+                if (value === 'medicine_company_id') {
+                    orderBy = 'medicine_company_id';
+                    orderType = 'asc';
+                }
+                if (value === 'address') {
+                    orderBy = 'address';
+                    orderType = 'asc';
+                }
+
+                fetchData();
+            }
+
+            function adjustSearch(searchItem) {
+
+                searchKey = $('#quickSearch').val();
+                if (searchKey.length >= 3) {
+                    fetchData();
+                }
+            }
+
+            function fetchData() {
+
+                $.ajax({
+                    method: "GET",
+                    url: prepareUrl(),
+                    success: function (response) {
+
+                        refreshTable(response);
+                    }
+                });
+            }
+
+        </script>
+
     </head>
     <body class="font-sans antialiased">
         <div class="min-h-screen bg-gray-100">
@@ -36,8 +116,10 @@
 
             <!-- Page Content -->
             <main>
+
                 {{ $slot }}
             </main>
+
         </div>
     </body>
 </html>

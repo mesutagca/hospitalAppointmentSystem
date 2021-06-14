@@ -2,13 +2,22 @@
 
 namespace App\Models;
 
+use App\Filters\Traits\Filterable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Folder extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
+    use Filterable;
+
+    protected $fillable=[
+        'disease_detail'
+    ];
 
     /**
      * All of the relationships to be touched.
@@ -22,14 +31,14 @@ class Folder extends Model
        return $this->belongsTo(Appointment::class);
     }
 
-    public function diagnose()
+    public function diagnose(): BelongsTo
     {
-       return $this->hasOne(Diagnose::class);
+       return $this->belongsTo(Diagnose::class);
     }
 
-    public function treatments()
+    public function treatment(): HasOne
     {
-        return $this->hasMany(Treatment::class);
+        return $this->hasOne(Treatment::class);
     }
 
     public function patientDocuments(): HasMany

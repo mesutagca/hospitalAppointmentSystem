@@ -2,70 +2,69 @@
 
 namespace App\Http\Controllers;
 
-
-use App\Models\User;
+use App\Http\Requests\Diagnose\DiagnoseListRequest;
+use App\Http\Requests\Diagnose\DiagnoseStoreRequest;
+use App\Http\Resources\Diagnose\DiagnoseResource;
+use App\Models\Diagnose;
 use App\Repositories\Contracts\DiagnoseRepositoryContract;
+use App\Services\Contracts\DiagnoseServiceContract;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Redirect;
 
 class DiagnoseController extends Controller
 {
-    private DiagnoseRepositoryContract $diagnoseRepository;
+    private DiagnoseServiceContract $diagnoseService;
 
-    public function __construct(DiagnoseRepositoryContract $diagnoseRepository)
+    public function __construct(DiagnoseServiceContract $diagnoseService)
     {
-        $this->diagnoseRepository=$diagnoseRepository;
+        $this->diagnoseService=$diagnoseService;
     }
 
-    public function index()
+    public function index(DiagnoseListRequest $request)
     {
-        return view('diagnose',['diagnoses'=>$this->diagnoseRepository->getAll()]);
+        $this->authorize('index', Diagnose::class);
+        return view('diagnose');
     }
 
-    public function list()
+    public function list(DiagnoseListRequest $request)
     {
-        return $this->diagnoseRepository->getAll();
+        $this->authorize('list', Diagnose::class);
+        return DiagnoseResource::collection( $this->diagnoseService->list($request))
+            ->response()
+            ->setStatusCode(200);
     }
 
-    public function show($diagnose_id)
+    public function show(DiagnoseListRequest $request, $diagnose_id):JsonResponse
     {
-        return view('diagnose',['diagnoses'=>$this->diagnoseRepository->getById($diagnose_id)]);
+    $this->authorize('show',Diagnose::class);
+    $diagnose=$this->diagnoseService->show($request, $diagnose_id);
+    return DiagnoseResource::make($diagnose)
+        ->response()
+        ->setStatusCode(200);
     }
 
-    public function store(Request $request)
+    public function store(DiagnoseStoreRequest $request)
     {
-        if (true) {
-            $data=['name'=>$request->name];
-            $this->diagnoseRepository->create($data);
-            return view('diagnose',['diagnoses'=>$this->diagnoseRepository->getAll()]);
-        }
-        return view('diagnose', [
-            'ERROR'=>'yetkiniz yok  Bunu blade te göstereedim ',
-            'diagnoses' => $this->diagnoseRepository->getAll()
-        ]);
+        $this->authorize('store',Diagnose::class);
+        $this->diagnoseService->store($request);
+        return Redirect::back();
     }
 
-    public function update($diagnose_id,Request $request)
+    public function update(DiagnoseStoreRequest $request, $diagnose_id)
     {
-        if (User::isAdmin()) {
-            $data=['name'=>$request->name];
-            $this->diagnoseRepository->update($diagnose_id,$data);
-            return view('diagnose',['diagnoses'=>$this->diagnoseRepository->getAll()]);
-        }
-        return view('diagnose', [
-            'ERROR'=>'yetkiniz yok  Bunu blade te göstereedim ',
-            'diagnoses' => $this->diagnoseRepository->getAll()
-        ]);
+        /** @var Diagnose $diagnose */
+        $diagnose=$this->diagnoseService->show($request, $diagnose_id);
+        $this->authorize('update', $diagnose );
+        return $this->diagnoseService->update($request, $diagnose);
     }
 
-    public function delete($diagnose_id)
+    public function delete(Request $request, $diagnose_id)
     {
-        if (User::isAdmin()) {
-            $this->diagnoseRepository->delete($diagnose_id);
-            return view('diagnose',['diagnoses'=>$this->diagnoseRepository->getAll()]);
-        }
-        return view('diagnose', [
-            'ERROR'=>'yetkiniz yok  Bunu blade te göstereedim ',
-            'diagnoses' => $this->diagnoseRepository->getAll()
-        ]);
+        /** @var Diagnose $diagnose */
+        $diagnose = $this->diagnoseService->show($request, $diagnose_id);
+        $this->authorize('delete', $diagnose);
+        return $this->diagnoseService->delete($diagnose);
     }
 }

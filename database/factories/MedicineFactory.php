@@ -22,9 +22,7 @@ class MedicineFactory extends Factory
     public function definition()
     {
         return [
-            'name'=>'paradol',
-            'active_ingredient'=>'paracetamol',
-            'barcode'=>'EAN 4792099200022',
+           //
         ];
     }
 }

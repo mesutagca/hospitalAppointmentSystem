@@ -23,8 +23,9 @@ class BranchListRequest extends FormRequest
      */
     public function rules()
     {
+
         return [
-      //
+            'name'=>'string | min:3',
         ];
     }
 }

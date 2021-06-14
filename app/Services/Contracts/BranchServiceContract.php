@@ -11,7 +11,7 @@ use Illuminate\Http\Request;
 
 interface BranchServiceContract
 {
-    public function list(BranchListRequest $request);
+       public function list(BranchListRequest $request);
 
     public function show(Request $request, int $branchId): ?Model;
 

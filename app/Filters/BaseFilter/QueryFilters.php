@@ -3,8 +3,9 @@
 
 namespace App\Filters\BaseFilter;
 
-
+use App\Enums\UserTypes;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 
 class QueryFilters
@@ -45,7 +46,7 @@ class QueryFilters
 
     protected function mandatoryFilters(): ?Builder
     {
-        return null;
+             return null;
     }
 
 

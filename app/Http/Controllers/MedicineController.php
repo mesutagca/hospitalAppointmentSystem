@@ -3,81 +3,80 @@
 namespace App\Http\Controllers;
 
 use App\Helper\Methods\HelperMethods;
+use App\Http\Requests\Medicine\MedicineListRequest;
+use App\Http\Requests\Medicine\MedicineStoreRequest;
+use App\Http\Resources\Medicine\MedicineResource;
 use App\Models\Medicine;
 use App\Models\MedicineCompany;
 use App\Models\User;
 use App\Repositories\Contracts\MedicineCompanyRepositoryContract;
 use App\Repositories\Contracts\MedicineRepositoryContract;
+use App\Services\Contracts\MedicineServiceContract;
+use Illuminate\Auth\Access\Gate;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Redirect;
 
 class MedicineController extends Controller
 {
-    private MedicineRepositoryContract $medicineRepository;
-    private MedicineCompanyRepositoryContract  $medicineCompanyRepository;
+    private MedicineServiceContract $medicineService;
 
 
-    public function __construct(MedicineRepositoryContract $medicineRepository,MedicineCompanyRepositoryContract $medicineCompanyRepository)
+
+    public function __construct(MedicineServiceContract $medicineService)
     {
-        $this->medicineRepository=$medicineRepository;
-        $this->medicineCompanyRepository=$medicineCompanyRepository;
+        $this->medicineService=$medicineService;
+
     }
 
-    public function index()
+    public function index(MedicineListRequest $request)
     {
-        $data=$this->medicineRepository->getAll();
-        return view('medicine',['medicines'=>HelperMethods::CompanyIdToName($data)]);
+        $this->authorize('index', Medicine::class);
+         return view('medicine');
     }
 
-    public function list()
+    public function list(MedicineListRequest $request)
     {
-        return $this->medicineRepository->getAll();
+        $this->authorize('list', Medicine::class);
+        return MedicineResource::collection($this->medicineService->list($request))
+            ->response()
+            ->setStatusCode(200);
     }
 
-    public function show($medicine_id)
+    public function show(MedicineListRequest $request, $medicine_id):JsonResponse
     {
-        $data=$this->medicineRepository->getById($medicine_id);
-        return view('medicine',['medicines'=>HelperMethods::CompanyIdToName($data)]);
+        $this->authorize('show',Medicine::class);
+        $medicine=$this->medicineService->show($request, $medicine_id);
+        return MedicineResource::make($medicine)
+            ->response()
+            ->setStatusCode(200);
     }
 
-    public function store(Request $request)
+    public function store(MedicineStoreRequest $request)
     {
-        if (User::isAdmin()) {
-            $data=HelperMethods::medicineDataToModel($request);
-            $this->medicineRepository->create($data);
-        return view('medicine', ['medicines' => $this->medicineRepository->getAll()]);
-    }
-        return view('medicine', [
-            'ERROR'=>'yetkiniz yok  Bunu blade te göstereedim ',
-            'medicines' => $this->medicineRepository->getAll()
-        ]);
+        $this->authorize('store', Medicine::class);
+        $this->medicineService->store($request);
+        return Redirect::back();
     }
 
-    public function update($medicine_id,Request $request)
+
+    public function update(MedicineStoreRequest $request, $medicine_id)
     {
-        if (User::isAdmin()) {
-            $data=HelperMethods::medicineDataToModel($request);
-            $this->medicineRepository->update($medicine_id,$data);
-            return view('medicine', ['medicines' => $this->medicineRepository->getAll()]);
-        }
-        return view('medicine', [
-            'ERROR'=>'yetkiniz yok  Bunu blade te göstereedim ',
-            'medicines' => $this->medicineRepository->getAll()
-        ]);
+        /** @var Medicine $medicine  */
+        $medicine=$this->medicineService->show($request, $medicine_id);
+        $this->authorize('update',$medicine);
+        return $this->medicineService->update($request, $medicine);
     }
 
-    public function delete($medicine_id)
+    public function delete(Request $request, $medicine_id)
     {
-        if (User::isAdmin()) {
-            $this->medicineRepository->delete($medicine_id);
-            return view('medicine', ['medicines' => $this->medicineRepository->getAll()]);
-        }
-        return view('medicine', [
-            'ERROR'=>'yetkiniz yok  Bunu blade te göstereedim ',
-            'medicines' => $this->medicineRepository->getAll()
-        ]);
+        /** @var Medicine $medicine */
+        $medicine = $this->medicineService->show($request, $medicine_id);
+        $this->authorize('delete', $medicine);
+        return $this->medicineService->delete($medicine);
     }
 
 }

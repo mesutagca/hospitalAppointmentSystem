@@ -20,5 +20,5 @@ class BranchRepository extends BaseEloquentRepository implements BranchRepositor
      */
     protected $model=Branch::class;
 
-    protected array $relationships = [];
+    protected array $relationships = [ 'doctors', 'doctors.user' ];
 }

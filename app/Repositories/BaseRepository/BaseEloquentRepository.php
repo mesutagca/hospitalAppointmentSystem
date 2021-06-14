@@ -178,6 +178,7 @@ class BaseEloquentRepository implements BaseRepositoryContract
      */
     public function getById(int $modelId): ?Model
     {
+
         $query = function () use ($modelId) {
             return $this->model
                 ->with($this->requiredRelationships)

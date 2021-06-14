@@ -5,17 +5,16 @@ namespace App\Policies\Traits;
 
 use App\Enums\ExceptionMessages;
 use App\Enums\ResponseCodes;
-use App\Facades\Authenticated;
 use Illuminate\Auth\Access\Response;
 
 trait PolicyCommonTrait
 {
-    private function validateOperationalType(array $allowedOprType): void
+    private function validateOperationalType(string $type, array $allowedOprType): void
     {
-        if (!in_array(Authenticated::user()->type, $allowedOprType)) {
+        if (!in_array($type, $allowedOprType)) {
             abort(
                 prepareCustomResponse("only" .
-                    implode(',', $allowedOprType) . "are allowed", 403, ResponseCodes::UNAUTHORIZED)
+                    implode(',', $allowedOprType) . "is allowed", 403, ResponseCodes::UNAUTHORIZED)
             );
         }
     }
@@ -27,14 +26,6 @@ trait PolicyCommonTrait
         );
 
         return Response::deny($message);
-    }
-
-    /**
-     * @return bool
-     */
-    private function isAdmin(): bool
-    {
-        return Authenticated::user()->type == "admin";
     }
 }
 
